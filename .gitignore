@@ -11,10 +11,9 @@
 *.suo
 *.old
 *.py
+*.pro
 
 #Debug-Release Directories
 
-build-proactiveMachines-Desktop_Qt_5_9_2_MSVC2015_64bit-Debug
-build-proactiveMachines-Desktop_Qt_5_9_2_MSVC2015_64bit-Release
-proactiveMachines/resources/STNs
-proactiveMachines/resources/myNetData
+resources/STNs/
+resources/myNetData/
