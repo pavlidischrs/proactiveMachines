@@ -6,15 +6,19 @@ This application combines **Computer Vision** and **Machine Learning (Deep Learn
 ![1](README_Image.png "Image")
 
 
-
-# Gettin Started
-
 **Detection Module**. Exploits the property that the concentric squares (Markers) have Contours with the same Mass Center. Using OpenCV, we **detect** the Markers and **extract** the inner image. 
 *[It should work with other concentric shapes as well!]*
 
 **Recognition Module**. It uses the pretrained-model ([files/pretrainedModel.caffemodel](files/pretrainedModel.caffemodel)) and the network model ([files/networkArchtecture.prototxt](networkArchtecture.prototxt)) to recognise the digit in the image.
+
 *[**Note**, the provided pre-trained model was trained with few iterations (in purpose) and has 84% accuracy.]*
+
 *[You can use **yours** network architecture and pre-trained model.]*
+
+
+# Getting Started
+## Installing
+Clone or download and compile.
 
 ## Prerequisites
 
