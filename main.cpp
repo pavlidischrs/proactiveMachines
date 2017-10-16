@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
         if(imageExtracted){
 
             std::vector<Prediction> digitPrediction =  DigitClassifierObj.classifyImage(extractedImage);
-            cout << "The network output as top predicition the digit : " << digitPrediction[0].first << endl;
+            cout << "Forward pass result: digit " << digitPrediction.at(0).first << endl;
 
             namedWindow( "Extracted Image", CV_GUI_EXPANDED );
             imshow("Extracted Image", extractedImage);
