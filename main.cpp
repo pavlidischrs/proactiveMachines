@@ -15,8 +15,8 @@
 
 
 
-#include "imageextractorclass.h"
-#include "digitclassifierclass.h"
+#include "imageExtractorClass.h"
+#include "digitClassifierClass.h"
 #include "opencv2/opencv.hpp"
 
 #include <vector>
@@ -30,9 +30,9 @@ int main(int argc, char* argv[]) {
 
 
     // Add yours paths
-    string model_file = "C:/Workspace/projects/proactiveMachines_0.1/proactiveMachines/resources/networkArchtecture.prototxt";
-    string trained_file = "C:/Workspace/projects/proactiveMachines_0.1/proactiveMachines/resources/pretrainedModel.caffemodel";
-    string labels_file = "C:/Workspace/projects/proactiveMachines_0.1/proactiveMachines/resources/labels";
+    string model_file = "C:/Workspace/projects/proactiveMachines_0.1/proactiveMachines/files/networkArchtecture.prototxt";
+    string trained_file = "C:/Workspace/projects/proactiveMachines_0.1/proactiveMachines/files/pretrainedModel.caffemodel";
+    string labels_file = "C:/Workspace/projects/proactiveMachines_0.1/proactiveMachines/files/labels";
     DigitClassifierClass DigitClassifierObj(model_file, trained_file, labels_file);
 
     VideoCapture cap(0);
@@ -43,10 +43,15 @@ int main(int argc, char* argv[]) {
     Mat frame;
     cap >> frame;
 
+    int i=1;
+    char c;
+
     for (;;){
 
         cap >> frame;
+//        frame = imread("dbg2.png");
 
+//        ImageExtractor.fillMarginWithColor(frame);
 
         // Extract the Image inside the Markers. If any.
         Mat extractedImage;
@@ -68,7 +73,12 @@ int main(int argc, char* argv[]) {
         imshow("Camera Image", frame);
 
 
-        if (waitKey(10) == 27) break; // stop capturing by pressing ESC
+        if(c==32){
+            imwrite("dbg3.png", frame);
+        }
+
+        if (c == 27) break; // stop capturing by pressing ESC
+        c = waitKey(10) ;
 
     }
 

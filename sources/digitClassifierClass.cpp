@@ -1,4 +1,4 @@
-#include "digitclassifierclass.h"
+#include "digitClassifierClass.h"
 
 using namespace digitClassifier;
 
