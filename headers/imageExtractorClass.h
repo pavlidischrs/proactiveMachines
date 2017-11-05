@@ -48,12 +48,6 @@ public:
     //
     bool extractImage(Mat image, Mat *output);
 
-
-    // **********Under construction....
-    // Sometimes the extracted image contains white areas near the boarder of the image.
-    // With this method we will color these areas black
-    void fillMarginWithColor(Mat image);
-
 private:
 
     // Given 3 points we can compute the 4th point which helps as

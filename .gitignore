@@ -15,5 +15,5 @@
 
 #Debug-Release Directories
 
-resources/STNs/
-resources/myNetData/
+proactiveMachines/resourceFiles/newData
+

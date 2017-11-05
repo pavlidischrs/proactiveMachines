@@ -82,11 +82,7 @@ bool ImageExtractorClass::extractImage(Mat image, Mat *output){
         Mat warpMatrix = takeAffineTransformation(topLeftBottomRight + Point(offset,offset), topRightBottomLeft + Point(-offset,offset), bottomLeftTopRight + Point(offset,-offset), bottomRightTopLeft + Point(-offset,-offset));
 
         // Apply the transformation to the original image and take the extracted image
-        warpAffine(image, extractedImage, warpMatrix, Size(100,100),cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
-
-        namedWindow( "debu4", CV_GUI_EXPANDED );
-        imshow("debu4", extractedImage);
-
+        warpAffine(image, extractedImage, warpMatrix, Size(100,100),INTER_LINEAR, BORDER_CONSTANT, Scalar(0, 0, 0));
 
 
 //Step 7 [FINAL]
@@ -108,24 +104,49 @@ bool ImageExtractorClass::extractImage(Mat image, Mat *output){
         if(true){
 
             debugImage = Mat::zeros( imageSize_, CV_8UC3 );
+debugImage=image;
 
-            cv::drawMarker(debugImage, topLeftBottomRight,  cv::Scalar(0, 0, 255), MARKER_CROSS, 10, 5);
-            cv::drawMarker(debugImage, topRightBottomLeft,  cv::Scalar(0, 0, 255), MARKER_CROSS, 10, 5);
-            cv::drawMarker(debugImage, bottomLeftTopRight,  cv::Scalar(0, 0, 255), MARKER_CROSS, 10, 5);
-            cv::drawMarker(debugImage, bottomRightTopLeft,  cv::Scalar(0, 0, 255), MARKER_CROSS, 10, 5);
+            drawMarker(debugImage, Point(10,15),  Scalar(255, 0, 0), MARKER_CROSS, 3, 5);
+            putText(debugImage, ": Created Points ", Point(20,20), CV_FONT_HERSHEY_SIMPLEX,0.6, Scalar(255,255,255),1,8);
+            drawMarker(debugImage, Point(10,35),  Scalar(0, 0, 255), MARKER_CROSS, 3, 5);
+            putText(debugImage, ": Closer points to the image center ", Point(20,40), CV_FONT_HERSHEY_SIMPLEX,0.6, Scalar(255,255,255),1,8);
 
-            cv::putText(debugImage, "TL", mc_[topLeft], CV_FONT_HERSHEY_SIMPLEX, 2,cv::Scalar(255,255,255),2,8);
-            cv::putText(debugImage, "TR", mc_[topRight], CV_FONT_HERSHEY_SIMPLEX,2, cv::Scalar(255,255,255),2,8);
-            cv::putText(debugImage, "BL", mc_[bottomLeft], CV_FONT_HERSHEY_SIMPLEX,2, cv::Scalar(255,255,255),2,8);
-            cv::drawMarker(debugImage, bottomRightMC,  cv::Scalar(255, 0, 0), MARKER_CROSS, 10, 5);
+            rectangle(debugImage, Point(12,debugImage.rows - 10), Point(28,debugImage.rows - 25), Scalar(0,0,255), 1, 8, 0);
+            putText(debugImage, ": Part of Extraction", Point(+30,debugImage.rows - 15), CV_FONT_HERSHEY_SIMPLEX,0.6, Scalar(255,255,255),1,8);
+            rectangle(debugImage, Point(12,debugImage.rows - 40), Point(28,debugImage.rows - 55), Scalar(0,255,0), 1, 8, 0);
+            putText(debugImage, ": Outestmost Contour of Marker", Point(+30,debugImage.rows - 45), CV_FONT_HERSHEY_SIMPLEX,0.6, Scalar(255,255,255),1,8);
 
 
-            cv::drawMarker(debugImage, innerImageCenter,  cv::Scalar(255, 0, 0), MARKER_CROSS, 10, 5);
+
+            drawMarker(debugImage, topLeftBottomRight,  Scalar(0, 0, 255), MARKER_CROSS, 10, 5);
+            drawMarker(debugImage, topRightBottomLeft,  Scalar(0, 0, 255), MARKER_CROSS, 10, 5);
+            drawMarker(debugImage, bottomLeftTopRight,  Scalar(0, 0, 255), MARKER_CROSS, 10, 5);
+            drawMarker(debugImage, bottomRightTopLeft,  Scalar(0, 0, 255), MARKER_CROSS, 10, 5);
+
+            putText(debugImage, "TopLeft", topLeftMC + Point(-50,-25), CV_FONT_HERSHEY_SIMPLEX,0.6,Scalar(180,180,180),0.1,8);
+            putText(debugImage, "TopRight", topRightMC + Point(30,0), CV_FONT_HERSHEY_SIMPLEX,0.6, Scalar(180,180,180),1,8);
+            putText(debugImage, "BottomLeft", bottomLeftMC + Point(-50,50), CV_FONT_HERSHEY_SIMPLEX,0.6, Scalar(180,180,180),1,8);
+
 
             for( int i = 0; i< indexesOfTheMarkerContours_.size(); i++ ){
                 Scalar color = Scalar( 0, 255, 0);
                 drawContours( debugImage, contours_, indexesOfTheMarkerContours_[i], color, 2, 8, hierarchy_, 0, Point() );
             }
+
+
+            Point polyPoints[1][4];
+            polyPoints[0][0] = topLeftBottomRight + Point(+5,+5) ;
+            polyPoints[0][1] = topRightBottomLeft + Point(-5,+5) ;
+            polyPoints[0][2] = bottomRightTopLeft + Point(-5,-5) ;
+            polyPoints[0][3] = bottomLeftTopRight + Point(+5,-5) ;
+
+            const Point* pts[1] = {polyPoints[0]};
+            const int npts[] = {4};
+            polylines(debugImage, pts, npts, 1, 1, Scalar(0,0,255), 2,8, 0);
+
+
+            drawMarker(debugImage, bottomRightMC,  Scalar(255, 0, 0), MARKER_CROSS, 10, 5);
+            drawMarker(debugImage, innerImageCenter,  Scalar(255, 0, 0), MARKER_CROSS, 10, 5);
 
             namedWindow( "Debug Image", CV_GUI_EXPANDED );
             imshow("Debug Image", debugImage);
@@ -142,98 +163,8 @@ bool ImageExtractorClass::extractImage(Mat image, Mat *output){
 }
 
 struct myclass {
-    bool operator() (cv::Point pt1, cv::Point pt2) { return (pt1.x < pt2.x);}
+    bool operator() (Point pt1, Point pt2) { return (pt1.y < pt2.y);}
 } sortingObject;
-
-
-void ImageExtractorClass::fillMarginWithColor(Mat image)
-{
-
-    // All Contours
-
-    vector<vector<Point> > contours;    // the contours
-    vector<Vec4i> hierarchy;            // the hierarchy of the contours
-    Mat srcGray;    // for grayscale image
-    // From colour to graysclae image
-    cvtColor( image, srcGray, CV_BGR2GRAY );
-    blur( srcGray, srcGray, Size(3,3) );          // Some typical blurring
-    Mat edges;
-    // Find the edges
-    int thres = 50;
-    Canny( srcGray, edges, thres, thres*2, 3 );
-    // Since you found the edges now create the contours
-    findContours( edges, contours, hierarchy, CV_RETR_EXTERNAL , CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
-
-
-    // Outer Contours
-    int threshold = 10;
-    vector<int> outerContours;
-
-    // Find the point of the contour which is closer to the Center of the Inner Image
-    for( int j=0; j< contours.size(); j++){
-
-        vector<Point> tempContour = contours.at(j);
-
-        for( int i=0; i< tempContour.size(); i++){
-
-            Point temp = tempContour.at(i);
-
-
-            if( temp.x < threshold ){//|| temp.y <threshold || temp.x>image.cols- threshold|| temp.y>image.rows- threshold){
-
-                tempContour.push_back(Point(0,0));
-
-                const Point* ppt[1] = { &tempContour[0] };
-                int npt[] = { tempContour.size() };
-
-                outerContours.push_back(j);
-                break;
-            }
-        }
-    }
-
-
-
-    for( int i = 0; i< outerContours.size(); i++ ){
-
-        vector<Point> tempContour = contours.at(outerContours.at(1));
-
-        RotatedRect rect = minAreaRect(tempContour);
-
-        Point2f rectPoints[4];
-        rect.points(&rectPoints[0]);
-
-        vector<Point> polyPoints;
-        polyPoints.push_back(Point(0,0));
-        polyPoints.push_back(rectPoints[0]);
-//        polyPoints.push_back(rectPoints[1]);
-        polyPoints.push_back(rectPoints[2]);
-//        polyPoints.push_back(rectPoints[3]);
-
-
-
-        const Point* ppt[1] = { &polyPoints[0] };
-        int npt[] = { polyPoints.size() };
-
-//        Mat dbg6;
-//        image.copyTo(dbg6);
-        fillPoly( image,
-                  ppt,
-                  npt,
-                  1,
-                  Scalar( 255, 0, 255 ),
-                  8 );
-
-//        namedWindow( "dbg6", CV_GUI_EXPANDED );
-//        imshow("dbg6", dbg6);
-
-        break;
-
-    }
-
-    namedWindow( "ImageExtractorClass", CV_GUI_EXPANDED );
-    imshow("ImageExtractorClass", image);
-}
 
 Point ImageExtractorClass::createBottomRightPoint(Point topLeftMC, Point topRightMC, Point bottomLeftMC){
 
