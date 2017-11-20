@@ -12,8 +12,9 @@
 *.old
 *.py
 *.pro
+*.autosave
 
 #Debug-Release Directories
 
-proactiveMachines/resourceFiles/newData
+resourceFiles/newData
 

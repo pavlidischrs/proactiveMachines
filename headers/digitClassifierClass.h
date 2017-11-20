@@ -24,9 +24,6 @@
 #define CMAKE_WINDOWS_BUILD
 
 
-
-
-
 #include <caffe/caffe.hpp>
 
 #include "opencv2/opencv.hpp"
@@ -106,7 +103,7 @@ private:
     static std::vector<int> argMax(const std::vector<float>& v, int N);
 
     // Compare the pairs of the parameters in terms of the first variable of the pair
-    static bool DigitClassifierClass::pairCompare(const std::pair<float, int>& lhs, const std::pair<float, int>& rhs);
+    static bool pairCompare(const std::pair<float, int>& lhs, const std::pair<float, int>& rhs);
 
 
     boost::shared_ptr<Net<float> > net_;   // The network of the model

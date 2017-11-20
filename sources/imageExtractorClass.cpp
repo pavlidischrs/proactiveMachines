@@ -19,25 +19,30 @@ bool ImageExtractorClass::extractImage(Mat image, Mat *output){
 
     bool succeed = false;
 
-//Step 1
+    //Step 1    -------------------------
     // Detect Contours of the input image
     detectContours(image);
 
-//Step 2
+
+    //Step 2    -------------------------
     // Examine each contours for possible markers
     examineContoursForMarkers();
 
-//Step 3
+
+    //Step 3    -------------------------
     // Find the positions of the Markers
     int topLeft, topRight, bottomLeft;
     Point topLeftMC, topRightMC, bottomLeftMC;
 
 
-    // if you have found 3 markers, go for the inner image
-    if(indexesOfTheMarkerContours_.size()==3){
+    //Step 4    -------------------------
+    // If you have found 3 markers and none of them is an outlier,
+    // then, extract the inner image
+    if(indexesOfTheMarkerContours_.size()==3    &&      noOutliersFound() ){
 
-//Step 4
-// Find the layout of the Markers, i.e. which one is the Top Left, Top Right and Bottom Left
+
+        //Step 5    -------------------------
+        // Find the layout of the Markers, i.e. which one is the Top Left, Top Right and Bottom Left
         findLayoutOfMarkers(&topLeft, &topRight, &bottomLeft);
 
         topLeftMC = mc_[topLeft];
@@ -49,12 +54,10 @@ bool ImageExtractorClass::extractImage(Mat image, Mat *output){
         bottomRightMC = createBottomRightPoint(topLeftMC, topRightMC, bottomLeftMC);
 
 
-
-//Step 5
-// Up to here, we have the mass centers of the Markers
-// Now, we want to find the Points of the Markers, which are closer to the inner image
-// e.g. for the Top Left we want its bottom right corner (This point will be on the Marker's contour, right?)
-
+        //Step 6    -------------------------
+        // Up to here, we have the mass centers of the Markers
+        // Now, we want to find the Points of the Markers, which are closer to the inner image
+        // e.g. for the Top Left we want its bottom right corner (This point will be on the Marker's contour, right?)
 
         // First, we have to find the center of the square that is formed by the Markers.
         // The center will be the intersection Point of the lines formed by the diagonal Markers
@@ -67,13 +70,14 @@ bool ImageExtractorClass::extractImage(Mat image, Mat *output){
         retrieveContourCorners(topLeft, innerImageCenter, &topLeftBottomRight);
         retrieveContourCorners(topRight, innerImageCenter, &topRightBottomLeft);
         retrieveContourCorners(bottomLeft, innerImageCenter, &bottomLeftTopRight);
+
+        imwrite("dbgImage1.png", image );
+
         bottomRightTopLeft = createBottomRightPoint(topLeftBottomRight, topRightBottomLeft, bottomLeftTopRight);
 
 
-//Step 6
-// Extract the inner image from whole image
-
-//        Mat extractedImage = Mat::zeros(100, 100, CV_8UC3 );
+        //Step 7    -------------------------
+        // Extract the inner image from whole image
         Mat extractedImage = Mat(100, 100, CV_8UC3 , Scalar(0,0,0));
         int offset = 10;
 
@@ -85,7 +89,7 @@ bool ImageExtractorClass::extractImage(Mat image, Mat *output){
         warpAffine(image, extractedImage, warpMatrix, Size(100,100),INTER_LINEAR, BORDER_CONSTANT, Scalar(0, 0, 0));
 
 
-//Step 7 [FINAL]
+        //Step 8 [FINAL]    -------------------------
         // Right the extracted image to output
         *output = extractedImage;
         if (output->size>0){
@@ -96,15 +100,15 @@ bool ImageExtractorClass::extractImage(Mat image, Mat *output){
         }
 
 
-// Debug block
-// Debug block
-// Debug block
-// Debug block
-// Change condition to false if you don't need it
+        // Debug block
+        // Debug block
+        // Debug block
+        // Debug block
+        // Change condition to false if you don't need it
         if(true){
 
             debugImage = Mat::zeros( imageSize_, CV_8UC3 );
-debugImage=image;
+            //debugImage = image.clone();   // uncomment if you want to draw the debug lines and points on the Web Cam image
 
             drawMarker(debugImage, Point(10,15),  Scalar(255, 0, 0), MARKER_CROSS, 3, 5);
             putText(debugImage, ": Created Points ", Point(20,20), CV_FONT_HERSHEY_SIMPLEX,0.6, Scalar(255,255,255),1,8);
@@ -112,7 +116,7 @@ debugImage=image;
             putText(debugImage, ": Closer points to the image center ", Point(20,40), CV_FONT_HERSHEY_SIMPLEX,0.6, Scalar(255,255,255),1,8);
 
             rectangle(debugImage, Point(12,debugImage.rows - 10), Point(28,debugImage.rows - 25), Scalar(0,0,255), 1, 8, 0);
-            putText(debugImage, ": Part of Extraction", Point(+30,debugImage.rows - 15), CV_FONT_HERSHEY_SIMPLEX,0.6, Scalar(255,255,255),1,8);
+            putText(debugImage, ": Extracted Part", Point(+30,debugImage.rows - 15), CV_FONT_HERSHEY_SIMPLEX,0.6, Scalar(255,255,255),1,8);
             rectangle(debugImage, Point(12,debugImage.rows - 40), Point(28,debugImage.rows - 55), Scalar(0,255,0), 1, 8, 0);
             putText(debugImage, ": Outestmost Contour of Marker", Point(+30,debugImage.rows - 45), CV_FONT_HERSHEY_SIMPLEX,0.6, Scalar(255,255,255),1,8);
 
@@ -142,7 +146,7 @@ debugImage=image;
 
             const Point* pts[1] = {polyPoints[0]};
             const int npts[] = {4};
-            polylines(debugImage, pts, npts, 1, 1, Scalar(0,0,255), 2,8, 0);
+            polylines(debugImage, pts, npts, 1, 1, Scalar(0,0,255), 2, CV_AA , 0);
 
 
             drawMarker(debugImage, bottomRightMC,  Scalar(255, 0, 0), MARKER_CROSS, 10, 5);
@@ -429,7 +433,29 @@ void ImageExtractorClass::examineContoursForMarkers(){
 
     }
 
+}
 
+bool ImageExtractorClass::noOutliersFound(){
+
+    int index0 = indexesOfTheMarkerContours_.at(0);
+    int index1 = indexesOfTheMarkerContours_.at(1);
+    int index2 = indexesOfTheMarkerContours_.at(2);
+
+
+    // We compute the size of the area of each Marker
+    double area1 = contourArea( contours_.at( index0 ) );
+    double area2 = contourArea( contours_.at( index1 ) );
+    double area3 = contourArea( contours_.at( index2 ) );
+
+    // If the areas of the found Markers have substantial difference then you have an oulier.
+    // I.e. if the Markers have not got the same size of area, then the algorithm has incorrectly identified a Marker
+    //
+    if( abs(area1-area2) > 200 ||  abs(area1-area2) > 200 ||  abs(area1-area2) > 200 ){
+        return false;
+    }
+    else{
+        return true;
+    }
 
 }
 
@@ -456,11 +482,6 @@ int ImageExtractorClass::checkConcentrics(int i){
     }
 
 }
-
-
-
-
-
 
 void ImageExtractorClass::clearVariables(){
 

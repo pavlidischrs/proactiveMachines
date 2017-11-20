@@ -13,7 +13,15 @@ This application combines **Computer Vision** and **Machine Learning (Deep Learn
 
 *[You can use your network architecture and pre-trained model.]*
 
+<br/>
 
+**Click image to wacth a demo**
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=2vS3Db4MVzU
+" target="_blank"><img src="http://img.youtube.com/vi/2vS3Db4MVzU/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
+
+<br/>
 # Getting Started
 ## Installing
 Clone or download and compile.

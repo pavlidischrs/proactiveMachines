@@ -19,6 +19,8 @@
 
 #include <iterator>
 
+#include<cmath>
+
 #include <algorithm>
 
 enum
@@ -35,6 +37,7 @@ using namespace std;
 class ImageExtractorClass
 {
 public:
+
     ImageExtractorClass();
 
     // The main functions of the class. It extracts an image include into 3 Markers and writes the result to the output!
@@ -62,14 +65,15 @@ private:
     // to an orthogonal rectangle
     Mat takeAffineTransformation(Point2f TL, Point2f TR, Point2f BL, Point2f BR);
 
+
     // Compute the perspective transformation of the markers subject to the markers position
     Mat takePerspectiveTransformation(Point2f TL, Point2f TR, Point2f BL, Point2f BR);
-
 
     // This functions retrives the points of the contour which are closer to the center of the inner image (or the center of the square formed by the 3 Markers)
     // For each point it computes the distance from the center.
     // The shortest distance would come from the point closer to the center and we write it to the closerPoint argument
     void retrieveContourCorners(int contourIndex, Point innerImageCenter, Point *closerPoint);
+
 
     // This method finds the Layout of the Markers, i.e. the top left/right and bottom left.
     //
@@ -78,6 +82,7 @@ private:
     // 3. Then we use the slope and distance of the line from 1. to identify the Top Right and Bottom Left Marker (with findSlopeAndDistance() method)
     //
     void findLayoutOfMarkers(int *topLeft, int *topRight, int *bottomLeft);
+
 
     // This method is used from the findLayoutOfMarkers to compute the Top Right and Bottom Left
     // It finds the Slope of the bigger edge of a triangle and then computes the Distance from the Top Left Marker
@@ -100,21 +105,35 @@ private:
     // and outputs the result at argumentsL *topRight and *bottomLeft
     void findTRandBL(Point topLeft, int index1, int index2, int *topRight, int *bottomLeft);
 
+
     // This method find the condours of the input image. You can draw these contours by passing one @arg Debug
     void detectContours(Mat srcImage);
+
 
     // This method examines the contours of the input image so as to find any Markers
     //
     void examineContoursForMarkers();
+
+
+    // This method checks if the found Markers are correct.
+    // We need this method because it is possible to detect a Markers incorrectly.
+    // Remember that in order to detect a Marker we search for concetnric squares.
+    // So, sometimes it happens to have concetric squares in an area of the image, where there is no Marker.
+    // (Try to draw the found contours and you will understand why it is this possible to happen)
+    //
+    // This method returns true if we have found all the Markers correctly.
+    // False, if we found a Marker incorrectly.
+    bool noOutliersFound();
+
 
     // Finds out the number of concentric contours (if any).
     // It does so recurisively by examining the hierarchy of the contours
     // to find out if the children of contours are concentric
     int checkConcentrics(int i);
 
+
     // This method releases all the values of the used variables, contours, etc.
     void clearVariables();
-
 
 
     vector<vector<Point> > contours_;    // the contours
@@ -127,10 +146,9 @@ private:
 
     Size imageSize_;
 
-    int massCentersThreshold_ = 5; // or 10??
-
     Mat debugImage;
 
+    int massCentersThreshold_ = 5;
 
 };
 
