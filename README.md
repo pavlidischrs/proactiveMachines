@@ -1,6 +1,6 @@
 # Description
 
-This application combines **Computer Vision** and **Machine Learning (Deep Learning)** to detect and recognise a digit from the **MNIST** database. The detection module uses the OpenCV library to extract a part of the image acquired from a Web Camera which is on the inside of 3 Markers (check [files/imageWithMarkers.png](files/imageWithMarkers.png)). The recognition module uses the Caffe framework and the **LeNet CNN** to classify the image and finally recognise the digit.
+This application combines **Computer Vision** and **Machine Learning (Deep Learning)** to detect and recognise a digit from the **MNIST** database. The detection module uses the OpenCV library to extract a part of the image acquired from a Web Camera which is on the inside of 3 Markers (check [resourceFiles/testImages/0.jpg](files/resourceFiles/testImages/0.jpg)). The recognition module uses the Caffe framework and the **LeNet CNN** to classify the image and finally recognise the digit.
 
 
 ![1](README_Image.png "Image")
